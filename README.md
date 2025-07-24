@@ -37,7 +37,7 @@ Provides two inference backends depending on your hardware:
 
 ### 🧪 From source (editable)
 ```bash
-git clone https://github.com/yourname/squeezelm.git
+git clone https://github.com/Xianyu39/SqueezeLM.git
 cd squeezelm
 pip install -e .
 ```
