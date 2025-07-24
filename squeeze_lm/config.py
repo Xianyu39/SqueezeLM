@@ -1,0 +1,2 @@
+LLM_MODEL_NAME = "gpt-3.5-turbo"
+LLM_TEMPERATURE = 0.3

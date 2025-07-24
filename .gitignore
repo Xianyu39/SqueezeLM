@@ -1,0 +1,85 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions and compiled binaries
+*.so
+*.o
+*.out
+*.a
+*.dylib
+*.dll
+*.exe
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Logs and runtime files
+*.log
+*.pid
+*.sqlite
+*.db
+*.lock
+
+# PyInstaller
+*.spec
+dist/
+build/
+
+# Test coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# MyPy, Pyright, etc.
+.mypy_cache/
+.pyright/
+.dmypy.json
+.pyre/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+
+# Distribution / packaging
+*.egg
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+*.whl
+
+# VS Code Python settings
+.vscode/settings.json
+
+# LLaMA.cpp / vLLM generated binaries
+server/llama.cpp/build/
+server/llama.cpp/bin/
+server/vllm_logs/
+
+# Local data or result dumps
+*.jsonl
+*.tmp
+*.bak
+*.dat
+*.pkl
+
+# System files
+.DS_Store
+Thumbs.db
+
+# test
+scripts/*
