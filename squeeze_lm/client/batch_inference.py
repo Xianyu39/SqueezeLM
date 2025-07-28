@@ -17,12 +17,15 @@ def batch_inference(
     write_mode='w',
     timeout: int = 180,
     rate_limit: int = 10,
-    time_window: float = 5.0
+    time_window: float = 5.0,
+    wait_time_base: float = 1,
+    retries: int = 5,
+    check_response=lambda x: True
 ) -> None:
 
     async def run_all_tasks():
         async with aiofiles.open(output_file, write_mode, encoding='utf-8') as f:
-            inf = Inference(base_url=base_url, api_key=api_key, rate_limit=rate_limit, time_window=time_window)
+            inf = Inference(base_url=base_url, api_key=api_key, rate_limit=rate_limit, time_window=time_window, retries=retries, wait_time_base=wait_time_base, check_response=check_response)
             
             if verbose:
                 print(f"Handle {len(lines)} request(s), split into {ceil(len(lines)/batch_size)} batch(es) of size {batch_size}.")

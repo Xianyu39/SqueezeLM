@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "squeeze_lm"
-version = "0.1.0"
+version = "0.2.0"
 description = "A lighter, practical inference toolkit to exploit the computational ability of OpenAI-Compatible API servers"
 authors = [
     { name = "Your Name", email = "you@example.com" }
