@@ -114,5 +114,5 @@ def generate_batch_prompt_lines(prompts: List[str | List[Dict[str, str]]], custo
         List[Dict]: A list of dictionaries representing the prompt lines.
     """
     if custom_ids is None:
-        custom_ids = [f"req_{i}" for i in range(len(prompts))]
+        custom_ids = [f"{i}" for i in range(len(prompts))]
     return [generate_prompt_line(custom_id, prompt, method, url, model, temperature, max_tokens=max_tokens, n_predict=n_predict) for custom_id, prompt in zip(custom_ids, prompts)]
