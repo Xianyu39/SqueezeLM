@@ -37,12 +37,13 @@ class Inference:
         self.retryable_statuses = {429, 500, 502, 503, 504}
     
 
-    async def ainference(self, method: str, url: str, body: dict, session: aiohttp.ClientSession) -> Dict:
+    async def ainference(self, method: str, url: str, body: dict, session: aiohttp.ClientSession, custom_id:str=None, timeout: aiohttp.ClientTimeout = aiohttp.ClientTimeout(total=180)) -> Dict:
+        prefix = ("Custom_id "+ custom_id + ": ") if custom_id is not None else ''
         for retry in range(self.retries):
             try:
                 await self.await_for_rate_limit()
                 # print(f"{self.base_url}{url}")
-                req = session.request(method, f"{self.base_url}{url}", json=body, headers=self.header)
+                req = session.request(method, f"{self.base_url}{url}", json=body, headers=self.header, timeout=timeout)
                 response = await req
                 if response.status == 200:
                     json = await response.json()
@@ -64,46 +65,47 @@ class Inference:
             except aiohttp.ClientResponseError as e:
                 if retry < self.retries - 1 and e.status in self.retryable_statuses:
                     wait_time = 2 ** (retry + self.wait_time_base)
-                    logger.warning(f"Retryable HTTP error {e.status}, retry {retry+1}, sleeping {wait_time}s")
+                    logger.warning(f"{prefix}Retryable HTTP error {e.status}, retry {retry+1}, sleeping {wait_time}s")
                     await asyncio.sleep(wait_time)
                 else:
-                    logger.error(f"Non-retryable HTTP error {e.status}: {e.message}")
+                    logger.error(f"{prefix}Non-retryable HTTP error {e.status}: {e.message}")
                     raise
 
             except aiohttp.ClientConnectionError as e:
                 if retry < self.retries - 1:
                     wait_time = 2 ** (retry + self.wait_time_base)
-                    logger.warning(f"Connection failed on retry {retry+1}, sleeping {wait_time}s")
+                    logger.warning(f"{prefix}Connection failed on retry {retry+1}, sleeping {wait_time}s")
                     await asyncio.sleep(wait_time)
                 else:
-                    logger.error("Connection failed permanently.")
+                    logger.error(f"{prefix}Connection failed permanently.")
                     raise
 
             except aiohttp.ClientError as e:
                 if retry < self.retries - 1:
                     wait_time = 2 ** (retry + self.wait_time_base)
-                    logger.warning(f"Client error on retry {retry+1}, sleeping {wait_time}s: {e}")
+                    logger.warning(f"{prefix}Client error on retry {retry+1}, sleeping {wait_time}s: {e}")
                     await asyncio.sleep(wait_time)
                 else:
-                    logger.error("Client error, giving up.")
+                    logger.error(f"{prefix}Client error, giving up.")
                     raise
             except InvalidResponseContent as e:
                 if retry < self.retries - 1:
                     wait_time = 2 ** (retry + self.wait_time_base)
-                    logger.warning(f"Response error on retry {retry+1}, sleeping {wait_time}s: {e}")
+                    logger.warning(f"{prefix}Response error on retry {retry+1}, sleeping {wait_time}s: {e}")
                     await asyncio.sleep(wait_time)
                 else:
-                    logger.error("Response error, giving up.")
+                    logger.error(f"{prefix}Response error, giving up.")
                     raise
                 
 
     def inference(
-        self, method: str, url: str, body: dict, client: httpx.Client
+        self, method: str, url: str, body: dict, client: httpx.Client, custom_id: str = None, timeout: float = 180
     ) -> Dict:
+        prefix = ("Custom_id "+ custom_id + ": ") if custom_id is not None else ''
         for retry in range(self.retries):
             try:
                 response = client.request(
-                    method, f"{self.base_url}{url}", json=body, headers=self.header
+                    method, f"{self.base_url}{url}", json=body, headers=self.header, timeout=timeout
                 )
 
                 if response.status_code == 200:
@@ -111,7 +113,7 @@ class Inference:
                     if self.check_response(json_data):
                         return json_data
                     raise InvalidResponseContent(
-                        "Response content does not meet expected format or constraints.",
+                        f"Response content does not meet expected format or constraints.",
                         json_data,
                     )
                 else:
@@ -121,33 +123,33 @@ class Inference:
                 if retry < self.retries - 1 and e.response.status_code in self.retryable_statuses:
                     wait_time = 2 ** (retry + self.wait_time_base)
                     logger.warning(
-                        f"Retryable HTTP error {e.response.status_code}, retry {retry+1}, sleeping {wait_time}s"
+                        f"{prefix}Retryable HTTP error {e.response.status_code}, retry {retry+1}, sleeping {wait_time}s"
                     )
                     time.sleep(wait_time)
                 else:
-                    logger.error(f"Non-retryable HTTP error {e.response.status_code}: {e.response.text}")
+                    logger.error(f"{prefix}Non-retryable HTTP error {e.response.status_code}: {e.response.text}")
                     raise
 
             except httpx.ConnectError:
                 if retry < self.retries - 1:
                     wait_time = 2 ** (retry + self.wait_time_base)
                     logger.warning(
-                        f"Connection failed on retry {retry+1}, sleeping {wait_time}s"
+                        f"{prefix}Connection failed on retry {retry+1}, sleeping {wait_time}s"
                     )
                     time.sleep(wait_time)
                 else:
-                    logger.error("Connection failed permanently.")
+                    logger.error(f"{prefix}Connection failed permanently.")
                     raise
 
             except InvalidResponseContent as e:
                 if retry < self.retries - 1:
                     wait_time = 2 ** (retry + self.wait_time_base)
                     logger.warning(
-                        f"Response error on retry {retry+1}, sleeping {wait_time}s: {e}"
+                        f"{prefix}Response error on retry {retry+1}, sleeping {wait_time}s: {e}"
                     )
                     time.sleep(wait_time)
                 else:
-                    logger.error("Response error, giving up.")
+                    logger.error(f"{prefix}Response error, giving up.")
                     raise
                 
 

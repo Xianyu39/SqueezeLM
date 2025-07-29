@@ -4,8 +4,7 @@ from tqdm.asyncio import trange
 from squeeze_lm.client.inference import Inference
 from typing import Dict
 import aiohttp, aiofiles, json, asyncio
-from squeeze_lm.config import LLM_MODEL_NAME, LLM_TEMPERATURE
-from squeeze_lm.config import LLM_MODEL_NAME, LLM_TEMPERATURE
+
 
 def batch_inference(
     lines: List,
@@ -15,7 +14,7 @@ def batch_inference(
     api_key: str,
     verbose=False,
     write_mode='w',
-    timeout: int = 180,
+    timeout: float = 180,
     rate_limit: int = 10,
     time_window: float = 5.0,
     wait_time_base: float = 1,
@@ -30,11 +29,12 @@ def batch_inference(
             if verbose:
                 print(f"Handle {len(lines)} request(s), split into {ceil(len(lines)/batch_size)} batch(es) of size {batch_size}.")
             
-            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=timeout)) as session:
+            async with aiohttp.ClientSession() as session:
                 iterator = (
                     trange(0, len(lines), batch_size, desc="Processing batch(es)", total=ceil(len(lines) / batch_size))
                     if verbose else range(0, len(lines), batch_size)
                 )
+                client_timeout = aiohttp.ClientTimeout(total=timeout)
 
                 for i in iterator:
                     batch = lines[i:i + batch_size]
@@ -42,7 +42,7 @@ def batch_inference(
                     
                     tasks = [
                         inf.ainference(
-                            line['method'], url=line['url'], body=line['body'], session=session
+                            line['method'], url=line['url'], body=line['body'], session=session, custom_id=line['custom_id'], timeout=client_timeout
                         ) for line in batch
                     ]
                     responses = await asyncio.gather(*tasks, return_exceptions=True)
@@ -60,8 +60,7 @@ def batch_inference(
                         else:
                             nl['response'] = response
 
-                        await f.write(json.dumps(nl, ensure_ascii=False))
-                        await f.write('\n')
+                        await f.write(json.dumps(nl, ensure_ascii=False)+'\n')
                         await f.flush()
 
     asyncio.run(run_all_tasks())
