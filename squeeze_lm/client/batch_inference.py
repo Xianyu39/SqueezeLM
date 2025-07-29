@@ -4,7 +4,8 @@ from tqdm.asyncio import trange
 from squeeze_lm.client.inference import Inference
 from typing import Dict
 import aiohttp, aiofiles, json, asyncio
-
+from squeeze_lm.config import LLM_MODEL_NAME, LLM_TEMPERATURE
+from squeeze_lm.config import LLM_MODEL_NAME, LLM_TEMPERATURE
 
 def batch_inference(
     lines: List,
