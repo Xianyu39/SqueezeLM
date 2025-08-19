@@ -1,0 +1,6 @@
+vllm[flashinfer]
+ray[default]
+fastapi
+uvicorn
+prometheus-client
+huggingface_hub
