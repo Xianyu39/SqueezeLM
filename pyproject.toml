@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "squeeze_lm"
-version = "0.2.2"
+version = "1.2.3"
 description = "A lighter, practical inference toolkit to exploit the computational ability of OpenAI-Compatible API servers"
 authors = [
-    { name = "Your Name", email = "you@example.com" }
+    { name = "Westwoods39", email = "Westwoods39@github.com" }
 ]
 license = { text = "MIT" }
 readme = "README.md"
@@ -17,7 +17,6 @@ dependencies = [
     "aiohttp",
     "aiofiles",
     "tqdm",
-    "httpx"
 ]
 
 [project.optional-dependencies]
